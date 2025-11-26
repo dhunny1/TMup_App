@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Room {{ code }}</title>
+</head>
+<body>
+  <h2>Room Code: {{ code }}</h2>
+  <p>Created by: {{ creator }}</p>
+
+  <h3>Participants ({{ participants|length }})</h3>
+  <ul>
+    {% for p in participants %}
+      <li>{{ p }}</li>
+    {% endfor %}
+  </ul>
+
+  <a href="/">Back to Home</a>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+    var socket = io();
+
+    // Join the room on the server
+    socket.emit("join", { code: "{{ code }}" });
+
+    // Listen for participant updates
+    socket.on("update_participants", function(data) {
+        if (data.code === "{{ code }}") {
+        var list = document.querySelector("ul");
+        list.innerHTML = "";
+        data.participants.forEach(function(name) {
+            var li = document.createElement("li");
+            li.textContent = name;
+            list.appendChild(li);
+        });
+
+        // Update count
+        document.querySelector("h3").textContent = 
+            "Participants (" + data.participants.length + ")";
+        }
+    });
+    </script>
+</body>
+</html>
